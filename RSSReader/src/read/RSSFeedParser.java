@@ -17,15 +17,13 @@ import rssModel.FeedMessage;
 public class RSSFeedParser {
 	
         private static final String TITLE = "title";
-        private static final String DESCRIPTION = "description"; // not necessary
-        private static final String CHANNEL = "channel"; // necessary ?
-        private static final String LANGUAGE = "language"; // not necessary
-        private static final String COPYRIGHT = "copyright"; // not necessary
+        private static final String DESCRIPTION = "description";
         private static final String LINK = "link";
         private static final String AUTHOR = "author";
         private static final String ITEM = "item";
         private static final String PUB_DATE = "pubDate";
-        private static final String GUID = "guid";  // not necessary
+        private static final String CATEGORY = "category";
+        //private static final String BODY = "body";
 
         private final URL url;
 
@@ -45,11 +43,10 @@ public class RSSFeedParser {
                         String description = "";
                         String title = "";
                         String link = "";
-                        String language = "";
-                        String copyright = "";
                         String author = "";
                         String pubdate = "";
-                        String guid = "";
+                        String category = "";
+                        //String body = "";
 
                         // First create a new XMLInputFactory
                         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -66,8 +63,7 @@ public class RSSFeedParser {
                                         case ITEM:
                                                 if (isFeedHeader) {
                                                         isFeedHeader = false;
-                                                        feed = new Feed(title, link, description, language,
-                                                                        copyright, pubdate);
+                                                        feed = new Feed(title, link, description);
                                                 }
                                                 event = eventReader.nextEvent();
                                                 break;
@@ -80,30 +76,29 @@ public class RSSFeedParser {
                                         case LINK:
                                                 link = getCharacterData(event, eventReader);
                                                 break;
-                                        case GUID:
-                                                guid = getCharacterData(event, eventReader);
-                                                break;
-                                        case LANGUAGE:
-                                                language = getCharacterData(event, eventReader);
-                                                break;
                                         case AUTHOR:
                                                 author = getCharacterData(event, eventReader);
                                                 break;
                                         case PUB_DATE:
                                                 pubdate = getCharacterData(event, eventReader);
                                                 break;
-                                        case COPYRIGHT:
-                                                copyright = getCharacterData(event, eventReader);
-                                                break;
+                                        case CATEGORY:
+                                            category = getCharacterData(event, eventReader);
+                                            break;
+                                        /*case BODY:
+                                            body = getCharacterData(event, eventReader);
+                                            break;*/
                                         }
                                 } else if (event.isEndElement()) {
                                         if (event.asEndElement().getName().getLocalPart() == (ITEM)) {
                                                 FeedMessage message = new FeedMessage();
                                                 message.setAuthor(author);
                                                 message.setDescription(description);
-                                                message.setGuid(guid);
                                                 message.setLink(link);
                                                 message.setTitle(title);
+                                                message.setPublicationDate(pubdate);
+                                                message.setCategory(category);
+                                                //message.setBody(body);
                                                 feed.getMessages().add(message);
                                                 event = eventReader.nextEvent();
                                                 continue;

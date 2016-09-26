@@ -1,8 +1,8 @@
 package mainPackage;
 
+import read.RSSFeedParser;
 import rssModel.Feed;
 import rssModel.FeedMessage;
-import read.RSSFeedParser;
 
 public class MainReader {
 	
