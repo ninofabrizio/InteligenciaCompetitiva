@@ -15,117 +15,125 @@ import rssModel.Feed;
 import rssModel.FeedMessage;
 
 public class RSSFeedParser {
-	
-        private static final String TITLE = "title";
-        private static final String DESCRIPTION = "description";
-        private static final String LINK = "link";
-        private static final String AUTHOR = "author";
-        private static final String ITEM = "item";
-        private static final String PUB_DATE = "pubDate";
-        private static final String CATEGORY = "category";
-        //private static final String BODY = "body";
 
-        private final URL url;
+	// These I use to orient myself inside the XML file of the RSS link
+	private static final String TITLE = "title";
+	private static final String DESCRIPTION = "description";
+	private static final String LINK = "link";
+	private static final String AUTHOR = "author";
+	private static final String ITEM = "item";
+	private static final String PUB_DATE = "pubDate";
+	private static final String CATEGORY = "category";
 
-        public RSSFeedParser(String feedUrl) {
-                try {
-                        this.url = new URL(feedUrl);
-                } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                }
-        }
+	private final URL url;
 
-        public Feed readFeed() {
-                Feed feed = null;
-                try {
-                        boolean isFeedHeader = true;
-                        // Set header values initial to the empty string
-                        String description = "";
-                        String title = "";
-                        String link = "";
-                        String author = "";
-                        String pubdate = "";
-                        String category = "";
-                        //String body = "";
+	// Method to create the instance holding the URL directory info
+	public RSSFeedParser(String feedUrl) {
+		try {
+			this.url = new URL(feedUrl);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-                        // First create a new XMLInputFactory
-                        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-                        // Setup a new eventReader
-                        InputStream in = read();
-                        XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
-                        // read the XML document
-                        while (eventReader.hasNext()) {
-                                XMLEvent event = eventReader.nextEvent();
-                                if (event.isStartElement()) {
-                                        String localPart = event.asStartElement().getName()
-                                                        .getLocalPart();
-                                        switch (localPart) {
-                                        case ITEM:
-                                                if (isFeedHeader) {
-                                                        isFeedHeader = false;
-                                                        feed = new Feed(title, link, description);
-                                                }
-                                                event = eventReader.nextEvent();
-                                                break;
-                                        case TITLE:
-                                                title = getCharacterData(event, eventReader);
-                                                break;
-                                        case DESCRIPTION:
-                                                description = getCharacterData(event, eventReader);
-                                                break;
-                                        case LINK:
-                                                link = getCharacterData(event, eventReader);
-                                                break;
-                                        case AUTHOR:
-                                                author = getCharacterData(event, eventReader);
-                                                break;
-                                        case PUB_DATE:
-                                                pubdate = getCharacterData(event, eventReader);
-                                                break;
-                                        case CATEGORY:
-                                            category = getCharacterData(event, eventReader);
-                                            break;
-                                        /*case BODY:
-                                            body = getCharacterData(event, eventReader);
-                                            break;*/
-                                        }
-                                } else if (event.isEndElement()) {
-                                        if (event.asEndElement().getName().getLocalPart() == (ITEM)) {
-                                                FeedMessage message = new FeedMessage();
-                                                message.setAuthor(author);
-                                                message.setDescription(description);
-                                                message.setLink(link);
-                                                message.setTitle(title);
-                                                message.setPublicationDate(pubdate);
-                                                message.setCategory(category);
-                                                //message.setBody(body);
-                                                feed.getMessages().add(message);
-                                                event = eventReader.nextEvent();
-                                                continue;
-                                        }
-                                }
-                        }
-                } catch (XMLStreamException e) {
-                        throw new RuntimeException(e);
-                }
-                return feed;
-        }
+	// Method to read the content of the XML file and extract what I need from
+	// it
+	public Feed readFeed() {
+		Feed feed = null;
+		try {
+			boolean isFeedHeader = true;
+			// Setting these empty in case there're some of them missing inside
+			// the XML file
+			String description = "";
+			String title = "";
+			String link = "";
+			String author = "";
+			String pubdate = "";
+			String category = "";
 
-        private String getCharacterData(XMLEvent event, XMLEventReader eventReader)
-                        throws XMLStreamException {
-                String result = "";
-                event = eventReader.nextEvent();
-                if (event instanceof Characters) {
-                        result = event.asCharacters().getData();
-                }
-                return result;
-        }
+			// Creating what I need to start reading the XML file
+			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+			InputStream in = read();
+			XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
 
-        private InputStream read() {
-                try {
-                        return url.openStream();
-                } catch (IOException e) {
-                        throw new RuntimeException(e);
-                }
-        }
+			// Reading the file. Here I pull info for each article inside the
+			// RSS Feed (that's why a loop)
+			while (eventReader.hasNext()) {
+				XMLEvent event = eventReader.nextEvent();
+				if (event.isStartElement()) {
+					String localPart = event.asStartElement().getName()
+							.getLocalPart();
+					// Here I check the blocks that contain what I want inside
+					// the file
+					switch (localPart) {
+					// Regarding my feed
+					case ITEM:
+						if (isFeedHeader) {
+							isFeedHeader = false;
+							feed = new Feed(title, link, description);
+						}
+						event = eventReader.nextEvent();
+						break;
+					// Regarding my articles
+					case TITLE:
+						title = getCharacterData(event, eventReader);
+						break;
+					case DESCRIPTION:
+						description = getCharacterData(event, eventReader);
+						break;
+					case LINK:
+						link = getCharacterData(event, eventReader);
+						break;
+					case AUTHOR:
+						author = getCharacterData(event, eventReader);
+						break;
+					case PUB_DATE:
+						pubdate = getCharacterData(event, eventReader);
+						break;
+					case CATEGORY:
+						category = getCharacterData(event, eventReader);
+						break;
+					}
+				} else if (event.isEndElement()) {
+					// It got to the end of the XML (at least what interests me)
+					if (event.asEndElement().getName().getLocalPart() == (ITEM)) {
+						// Passing all the info I got to my objects
+						FeedMessage message = new FeedMessage();
+						message.setAuthor(author);
+						message.setDescription(description);
+						message.setLink(link);
+						message.setTitle(title);
+						message.setPublicationDate(pubdate);
+						message.setCategory(category);
+						feed.getMessages().add(message);
+						event = eventReader.nextEvent();
+						continue;
+					}
+				}
+			}
+		} catch (XMLStreamException e) {
+			throw new RuntimeException(e);
+		}
+		return feed;
+	}
+
+	// Method to read and get the info from the event
+	private String getCharacterData(XMLEvent event, XMLEventReader eventReader)
+			throws XMLStreamException {
+		String result = "";
+		event = eventReader.nextEvent();
+		if (event instanceof Characters) {
+			result = event.asCharacters().getData();
+		}
+		return result;
+	}
+
+	// Method to open the data stream from the URL address
+	private InputStream read() {
+		try {
+			return url.openStream();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

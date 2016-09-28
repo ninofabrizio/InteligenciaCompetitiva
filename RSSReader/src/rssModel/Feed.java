@@ -5,41 +5,40 @@ import java.util.List;
 
 public class Feed {
 
-        private final String title;
-        private final String link;
-        private final String description;
+	// Here are the attributes of a feed
+	private final String title;
+	private final String link;
+	private final String description;
 
-        final List<FeedMessage> entries = new ArrayList<FeedMessage>();
+	// My list of articles
+	final List<FeedMessage> entries = new ArrayList<FeedMessage>();
 
-        public Feed(String title, String link, String description) {
-                this.title = title;
-                this.link = link;
-                this.description = description;
-        }
+	public Feed(String title, String link, String description) {
+		this.title = title;
+		this.link = link;
+		this.description = description;
+	}
 
-        public List<FeedMessage> getMessages() {
-                return entries;
-        }
+	public List<FeedMessage> getMessages() {
+		return entries;
+	}
 
-        public String getTitle() {
-                return title;
-        }
+	public String getTitle() {
+		return title;
+	}
 
-        public String getLink() {
-                return link;
-        }
+	public String getLink() {
+		return link;
+	}
 
-        public String getDescription() {
-                return description;
-        }
+	public String getDescription() {
+		return description;
+	}
 
-        /*public String getCategory() {
-        		return category;
-        }*/
-        
-        @Override
-        public String toString() {
-                return "Feed [description=" + description
-                                + ", link=" + link + ", title=" + title + "]";
-        }
+	// Just to see the info inside the object of the class
+	@Override
+	public String toString() {
+		return "Feed [description=" + description + ", link=" + link
+				+ ", title=" + title + "]";
+	}
 }
