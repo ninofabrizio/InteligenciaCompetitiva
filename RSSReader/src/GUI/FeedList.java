@@ -51,8 +51,6 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 		optionPanel.setLayout(new BorderLayout());
 		getContentPane().add(optionPanel);
 
-		// TODO Here I call the method that pulls the feeds'
-		// URL's from the text file
 		list = MainReader.getList();
 
 		feedList = new JList<Vector>(list);
@@ -159,7 +157,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 				String url = list.elementAt(feedSelected).toString();
 
 				this.setVisible(false);
-				articleList = new ArticleList(url);
+				articleList = new ArticleList(this, url);
 			}
 		}
 

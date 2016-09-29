@@ -196,4 +196,11 @@ public class MainReader {
 		// Finishing by deleting the temporary file
 		tempFile.delete();
 	}
+
+	// Method to get the feed from the URL
+	public static Feed getFeed(String url) {
+
+		RSSFeedParser parser = new RSSFeedParser(url);
+		return parser.readFeed();
+	}
 }
