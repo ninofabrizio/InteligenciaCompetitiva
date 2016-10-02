@@ -176,6 +176,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 		rollingBar.repaint();
 	}
 	
+	// This method is declared because this class implements the one responsible for this method
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub

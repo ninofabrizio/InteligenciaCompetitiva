@@ -81,8 +81,6 @@ public class ArticleList extends JFrame implements ActionListener, ListSelection
 		
 		for(FeedMessage message : feed.getMessages()) {
 			
-			System.out.println(message.getLink());
-			
 			String data[]= {message.getTitle(), message.getAuthor(),
 				message.getCategory(), message.getPublicationDate()};
 
@@ -90,7 +88,7 @@ public class ArticleList extends JFrame implements ActionListener, ListSelection
 		}
 	}
 
-	// Method to specify the dimensions of the frame
+	// Method to specify the dimensions of a frame
 	private void createFrameDimension(JFrame frame, int width, int heigth) {
 
 		Toolkit tk = Toolkit.getDefaultToolkit();
@@ -207,6 +205,7 @@ public class ArticleList extends JFrame implements ActionListener, ListSelection
 		}
 	}
 	
+	// This method is declared because this class implements the one responsible for this method
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		// TODO Auto-generated method stub

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -32,16 +31,22 @@ public class RSSFeedParser {
 		try {
 			this.url = new URL(feedUrl);
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			throw new RuntimeException("Malformed URL");
 		}
 	}
 
-	// Method to read the content of the XML file and extract what I need from
-	// it
+	// Method to read the content of the XML file and extract what I need from it
 	public Feed readFeed() {
+		
 		Feed feed = null;
+		
 		try {
+			// Flags I use to make sure I take the right info
 			boolean isFeedHeader = true;
+			boolean isLink = true;
+			boolean isTitle = true;
+			
 			// Setting these empty in case there're some of them missing inside
 			// the XML file
 			String description = "";
@@ -50,7 +55,7 @@ public class RSSFeedParser {
 			String author = "";
 			String pubdate = "";
 			String category = "";
-
+			
 			// Creating what I need to start reading the XML file
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 			InputStream in = read();
@@ -59,42 +64,56 @@ public class RSSFeedParser {
 			// Reading the file. Here I pull info for each article inside the
 			// RSS Feed (that's why a loop)
 			while (eventReader.hasNext()) {
+				
 				XMLEvent event = eventReader.nextEvent();
 				if (event.isStartElement()) {
-					String localPart = event.asStartElement().getName()
-							.getLocalPart();
-					// Here I check the blocks that contain what I want inside
-					// the file
+					String localPart = event.asStartElement().getName().getLocalPart();
+					
+					// Here I check the blocks that contain what I want inside the file
 					switch (localPart) {
-					// Regarding my feed
-					case ITEM:
-						if (isFeedHeader) {
-							isFeedHeader = false;
-							feed = new Feed(title, link, description);
-						}
-						event = eventReader.nextEvent();
-						break;
-					// Regarding my articles
-					case TITLE:
-						title = getCharacterData(event, eventReader);
-						break;
-					case DESCRIPTION:
-						description = getCharacterData(event, eventReader);
-						break;
-					case LINK:
-						link = getCharacterData(event, eventReader);
-						break;
-					case AUTHOR:
-						author = getCharacterData(event, eventReader);
-						break;
-					case PUB_DATE:
-						pubdate = getCharacterData(event, eventReader);
-						break;
-					case CATEGORY:
-						category = getCharacterData(event, eventReader);
-						break;
+						// Regarding my feed
+						case ITEM:
+							if (isFeedHeader) {
+								isFeedHeader = false;
+								feed = new Feed(title, link, description);
+								isLink = true;
+								isTitle = true;
+							}
+							event = eventReader.nextEvent();
+							break;
+							
+						case TITLE:
+							if(isTitle) {
+								isTitle = false;
+								title = getCharacterData(event, eventReader);
+							}
+							break;
+							
+						case DESCRIPTION:
+							description = getCharacterData(event, eventReader);
+							break;
+							
+						case LINK:
+							if(isLink) {
+								isLink = false;
+								link = getCharacterData(event, eventReader);
+							}
+							break;
+							
+						case AUTHOR:
+							author = getCharacterData(event, eventReader);
+							break;
+							
+						case PUB_DATE:
+							pubdate = getCharacterData(event, eventReader);
+							break;
+							
+						case CATEGORY:
+							category = getCharacterData(event, eventReader);
+							break;
 					}
 				} else if (event.isEndElement()) {
+					
 					// It got to the end of the XML (at least what interests me)
 					if (event.asEndElement().getName().getLocalPart() == (ITEM)) {
 						// Passing all the info I got to my objects
@@ -106,20 +125,24 @@ public class RSSFeedParser {
 						message.setPublicationDate(pubdate);
 						message.setCategory(category);
 						feed.getMessages().add(message);
+						
 						event = eventReader.nextEvent();
+						isLink = true;
+						isTitle = true;
 						continue;
 					}
 				}
 			}
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			throw new RuntimeException("Problem at reading XML");
 		}
 		return feed;
 	}
 
 	// Method to read and get the info from the event
-	private String getCharacterData(XMLEvent event, XMLEventReader eventReader)
-			throws XMLStreamException {
+	private String getCharacterData(XMLEvent event, XMLEventReader eventReader) throws XMLStreamException {
+		
 		String result = "";
 		event = eventReader.nextEvent();
 		if (event instanceof Characters) {
@@ -130,10 +153,12 @@ public class RSSFeedParser {
 
 	// Method to open the data stream from the URL address
 	private InputStream read() {
+		
 		try {
 			return url.openStream();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			throw new RuntimeException("Problem at opening feed URL");
 		}
 	}
 }
