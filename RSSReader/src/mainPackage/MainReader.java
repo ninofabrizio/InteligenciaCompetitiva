@@ -41,18 +41,9 @@ public class MainReader {
 		
 		FeedList feedlist = new FeedList();
 		feedlist.setVisible(true);
-		
-		/* TODO Open URL inside a browser part
-		
-		  try { Desktop desktop = java.awt.Desktop.getDesktop(); URI oURL = new
-		  URI(feed.getMessages().get(0).getLink()); desktop.browse(oURL); }
-		  catch (Exception e) { e.printStackTrace(); }
-		 */
 	}
 
-	// TODO This method should read a text file and extract
-	// feeds' URL's from it, storing them inside a Vector
-	// and returning it.
+	// Method that reads the text file with the RSS links and populate a vector with them 
 	public static Vector getList() {
 		
 		feedList = new Vector();
@@ -64,6 +55,13 @@ public class MainReader {
 			feedList.add(urls.get(i));
 		
 		return feedList;
+	}
+	
+	// Method to get the feed from the URL
+	public static Feed getFeed(String url) {
+
+		RSSFeedParser parser = new RSSFeedParser(url);
+		return parser.readFeed();
 	}
 
 	// Method to get the text file content
@@ -116,7 +114,6 @@ public class MainReader {
 			else {
 				pw = new PrintWriter(new FileWriter(file, true));
 				pw.print("\n");
-				pw.print(url);
 			}
 			
 			pw.print(url);
@@ -153,8 +150,7 @@ public class MainReader {
 			while((currentLine = reader.readLine()) != null) {
 				
 				// Check and treat if the line has the URL I don't want
-			    String trimmedLine = currentLine.trim();
-			    if(trimmedLine.equals(url) || trimmedLine.equals("")) continue;
+			    if(currentLine.equals(url) || currentLine.equals("")) continue;
 			    
 			    if(flag) {
 			    	writer.write(currentLine);
@@ -195,12 +191,5 @@ public class MainReader {
 		
 		// Finishing by deleting the temporary file
 		tempFile.delete();
-	}
-
-	// Method to get the feed from the URL
-	public static Feed getFeed(String url) {
-
-		RSSFeedParser parser = new RSSFeedParser(url);
-		return parser.readFeed();
 	}
 }

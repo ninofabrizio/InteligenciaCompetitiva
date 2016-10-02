@@ -109,6 +109,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 	// Method to treat actions from the buttons and text field
 	@Override
 	public void actionPerformed(ActionEvent event) {
+		
 		if(event.getSource() == addRSSLink
 			&& feedURLInput.getText() != null
 			&& feedURLInput.getText().equals("") == false
