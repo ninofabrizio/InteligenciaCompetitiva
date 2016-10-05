@@ -20,6 +20,7 @@ public class RSSFeedParser {
 	private static final String DESCRIPTION = "description";
 	private static final String LINK = "link";
 	private static final String AUTHOR = "author";
+	private static final String CREATOR = "creator";
 	private static final String ITEM = "item";
 	private static final String PUB_DATE = "pubDate";
 	private static final String CATEGORY = "category";
@@ -45,7 +46,7 @@ public class RSSFeedParser {
 			// Flags I use to make sure I take the right info
 			boolean isFeedHeader = true;
 			boolean isLink = true;
-			boolean isTitle = true;
+			boolean isAuthor = false;
 			
 			// Setting these empty in case there're some of them missing inside
 			// the XML file
@@ -53,6 +54,7 @@ public class RSSFeedParser {
 			String title = "";
 			String link = "";
 			String author = "";
+			String creator = "";
 			String pubdate = "";
 			String category = "";
 			
@@ -76,17 +78,12 @@ public class RSSFeedParser {
 							if (isFeedHeader) {
 								isFeedHeader = false;
 								feed = new Feed(title, link, description);
-								isLink = true;
-								isTitle = true;
 							}
 							event = eventReader.nextEvent();
 							break;
 							
 						case TITLE:
-							if(isTitle) {
-								isTitle = false;
-								title = getCharacterData(event, eventReader);
-							}
+							title = getCharacterData(event, eventReader);
 							break;
 							
 						case DESCRIPTION:
@@ -102,6 +99,14 @@ public class RSSFeedParser {
 							
 						case AUTHOR:
 							author = getCharacterData(event, eventReader);
+							if(author.isEmpty())
+								isAuthor = false;
+							else
+								isAuthor = true;
+							break;
+						// Using creator as author, in case the author is not specified there	
+						case CREATOR:
+							creator = getCharacterData(event, eventReader);
 							break;
 							
 						case PUB_DATE:
@@ -118,7 +123,10 @@ public class RSSFeedParser {
 					if (event.asEndElement().getName().getLocalPart() == (ITEM)) {
 						// Passing all the info I got to my objects
 						FeedMessage message = new FeedMessage();
-						message.setAuthor(author);
+						if(isAuthor)
+							message.setAuthor(author);
+						else
+							message.setAuthor(creator);
 						message.setDescription(description);
 						message.setLink(link);
 						message.setTitle(title);
@@ -128,7 +136,7 @@ public class RSSFeedParser {
 						
 						event = eventReader.nextEvent();
 						isLink = true;
-						isTitle = true;
+						isAuthor = false;
 						continue;
 					}
 				}
