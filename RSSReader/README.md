@@ -9,7 +9,7 @@ Tutorial : http://www.vogella.com/tutorials/RSSFeed/article.html
 ---------------------------------------------------------------------------
 ## Known issues:
 
-- If a section contain symbols considered not character by **isCharacter** method, the string returned may stop at the first symbol read. Leaving the description of the section inside the table incomplete.
+- If a section contain symbols considered not character by **asCharacters** method, the string returned may stop at the first symbol read. Leaving the description of the section inside the table incomplete.
 
 - The way I "corrected" the link-get problem only works if the actual link for the article is put first before any other link section. If that's not the case, it may get a different link that is not from the article.
 
