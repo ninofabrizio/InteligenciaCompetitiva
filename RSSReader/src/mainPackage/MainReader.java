@@ -12,8 +12,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -22,11 +20,10 @@ import java.util.Vector;
 import GUI.FeedList;
 import read.RSSFeedParser;
 import rssModel.Feed;
-import rssModel.FeedMessage;
 
 public class MainReader {
 
-	private static Vector feedList;
+	private static Vector<String> feedList;
 	
 	public static void main(String[] args) {
 		
@@ -35,9 +32,9 @@ public class MainReader {
 	}
 
 	// Method that reads the text file with the RSS links and populate a vector with them 
-	public static Vector getList() {
+	public static Vector<String> getList() {
 		
-		feedList = new Vector();
+		feedList = new Vector<String>();
 		
 		String content = readFile();
 		List<String> urls = Arrays.asList(content.split("\n"));
@@ -64,11 +61,14 @@ public class MainReader {
 		try {
 			if(file.exists()) {
 				
-				scanner = new Scanner(file).useDelimiter("\\Z");
+				scanner = new Scanner(file);
+				scanner.useDelimiter("\\Z");
 			
 				// In case the file is empty
-				if(scanner.hasNext() == false)
+				if(scanner.hasNext() == false) {
+					scanner.close();
 					return "";
+				}
 				
 				String url = scanner.next();
 				scanner.close();

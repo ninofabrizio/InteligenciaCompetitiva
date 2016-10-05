@@ -19,13 +19,14 @@ import javax.swing.event.ListSelectionListener;
 
 import mainPackage.MainReader;
 
+@SuppressWarnings("serial")
 public class FeedList extends JFrame implements ActionListener, ListSelectionListener {
 
-	private ArticleList articleList;
-	
 	private JPanel optionPanel;
 	
+	@SuppressWarnings("rawtypes")
 	private JList<Vector> feedList;
+	@SuppressWarnings("rawtypes")
 	private Vector list;
 	
 	private JButton addRSSLink;
@@ -39,6 +40,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 	private int DEFAULT_WIDTH = 700;
 	private int DEFAULT_HEIGTH = 500;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public FeedList() {
 
 		setTitle("Choose a Feed URL or put a new one in the list");
@@ -158,7 +160,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 				String url = list.elementAt(feedSelected).toString();
 
 				this.setVisible(false);
-				articleList = new ArticleList(this, url);
+				new ArticleList(this, url);
 			}
 		}
 
@@ -169,6 +171,7 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void refresh() {
 		
 		feedList.setListData(list);

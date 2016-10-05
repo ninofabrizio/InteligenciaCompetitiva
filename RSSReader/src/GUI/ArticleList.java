@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -24,6 +23,7 @@ import mainPackage.MainReader;
 import rssModel.Feed;
 import rssModel.FeedMessage;
 
+@SuppressWarnings("serial")
 public class ArticleList extends JFrame implements ActionListener, ListSelectionListener {
 
 	private FeedList feedList;
