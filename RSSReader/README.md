@@ -14,3 +14,5 @@ Tutorial : http://www.vogella.com/tutorials/RSSFeed/article.html
 - The way I "corrected" the link-get problem only works if the actual link for the article is put first before any other link section. If that's not the case, it may get a different link that is not from the article.
 
 - Some of the problems corrected are connected to the fact that the way the XML files were built may vary from RSS Feed to RSS Feed. This project doesn't guarantee that it will be able to read well **EVERY** feed put inside the list by the user.
+
+- It only deletes the last link of the list, any other before that one remains.

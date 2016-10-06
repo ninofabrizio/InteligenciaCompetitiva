@@ -3,7 +3,6 @@ package GUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,44 +13,42 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import mainPackage.MainReader;
+import mainPackage.MainCrawler;
 
 public class InputWindow extends JFrame implements ActionListener {
 
 	private JPanel inputPanel;
 	
-	private JButton getMaxLinksNum;
+	private JButton getInfo;
 	
 	private JTextField linkInput;
+	private JTextField numberInput;
 	
 	private int maxLinksNum;
 	
-	private int DEFAULT_WIDTH = 300;
-	private int DEFAULT_HEIGTH = 120;
+	private int DEFAULT_WIDTH = 500;
+	private int DEFAULT_HEIGTH = 140;
 
 	public InputWindow() {
 		
 		setTitle("Input Window");
 		
 		createFrameDimension();
-		setLayout(new FlowLayout());
+		setLayout(new BorderLayout());
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.GRAY);
 		
 		inputPanel = new JPanel();
 		inputPanel.setLayout(new BorderLayout());
-		getContentPane().add(inputPanel);
+		getContentPane().add(inputPanel, BorderLayout.NORTH);
 		
 		JLabel label = new JLabel("Enter maximum number of links to visit:");
 		inputPanel.add(label, BorderLayout.BEFORE_FIRST_LINE);
 		
-		getMaxLinksNum = new JButton("OK");
-		inputPanel.add(getMaxLinksNum, BorderLayout.AFTER_LAST_LINE);
-		getMaxLinksNum.addActionListener(this);
+		numberInput = new JTextField();
+		inputPanel.add(numberInput, BorderLayout.CENTER);
 		
-		linkInput = new JTextField();
-		//linkInput.setText("Write link here");
-		inputPanel.add(linkInput, BorderLayout.CENTER);
+		createExtraPanel();
 	}
 	
 	// Method to specify the dimensions of the frame
@@ -69,22 +66,63 @@ public class InputWindow extends JFrame implements ActionListener {
 		setResizable(true);
 	}
 
+	// Method for the panel containing the buttons and text field
+	private void createExtraPanel() {
+
+		JPanel extraPanel = new JPanel();
+		extraPanel.setLayout(new BorderLayout());
+		inputPanel.add(extraPanel, BorderLayout.SOUTH);
+
+		JLabel label = new JLabel("Enter link to start crawling:");
+		extraPanel.add(label, BorderLayout.BEFORE_FIRST_LINE);
+
+		linkInput = new JTextField();
+		extraPanel.add(linkInput, BorderLayout.CENTER);
+		
+		getInfo = new JButton("OK");
+		extraPanel.add(getInfo, BorderLayout.AFTER_LAST_LINE);
+		getInfo.addActionListener(this);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		
-		if(event.getSource() == getMaxLinksNum
-				&& linkInput.getText() != null
-				&& linkInput.getText().equals("") == false
-				&& linkInput.getText().contains(" ") == false
-				&& linkInput.getText().contains("\t") == false
-				&& linkInput.getText().contains("-") == false
-				&& isNumeric(linkInput.getText())) {
+		if(event.getSource() == getInfo && checkNumberField(numberInput.getText()) 
+										&& checkLinkField(linkInput.getText())) {
 
-				MainReader.setMaxLinksNum(maxLinksNum);
+				MainCrawler.setInfo(maxLinksNum, linkInput.getText());
+				//numberInput.setText("");
 				//linkInput.setText("");
 				
 				setVisible(false);
 			}
+	}
+	
+	// Method to see if the text inside the link field fits
+	private boolean checkLinkField(String text) {
+		
+		if(text != null
+			&& text.equals("") == false
+			&& text.contains(" ") == false
+			&& text.contains("\t") == false)
+			return true;
+		else
+			return false;
+	}
+
+	// Method to see if the text inside the number field fits
+	private boolean checkNumberField(String str){
+		
+		if(str != null
+			&& str.equals("") == false
+			&& str.contains(" ") == false
+			&& str.contains("\t") == false
+			&& str.contains("-") == false
+			&& str.equals("0") == false
+			&& isNumeric(str))
+			return true;
+		else
+			return false;
 	}
 	
 	// Method to see if string is a valid number and retrieve it's value
