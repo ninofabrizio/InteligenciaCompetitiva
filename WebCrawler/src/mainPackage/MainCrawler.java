@@ -27,7 +27,8 @@ public class MainCrawler {
 		maxLinksNum = num;
 		addSite(link);
 
-		// System.out.println("Number " + maxLinksNum + "\nLink " + originalLink);
+		// TODO Test
+		//System.out.println("Number " + maxLinksNum + "\nLink " + originalLink);
 		
 		startCrawling();
 	}
@@ -36,13 +37,14 @@ public class MainCrawler {
 	private static void startCrawling() {
 		
 		int i = 0;
+		String link = null;
 		ProgressWindow pw = new ProgressWindow(maxLinksNum);
 		pw.setVisible(true);
 		
 		// I also check if there are no more sites referenced
-		while(i < maxLinksNum && linkedSites.size() > 0) {
+		while(i < maxLinksNum && (link = nextSite()) != null) {
 			
-			String link = nextSite();
+			//link = nextSite();
 			WebSite currentSite = getWebSite(link);
 			
 			writeFiles(currentSite);

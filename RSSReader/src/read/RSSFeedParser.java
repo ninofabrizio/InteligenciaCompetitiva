@@ -27,7 +27,6 @@ public class RSSFeedParser {
 
 	private final URL url;
 
-	// Method to create the instance holding the URL directory info
 	public RSSFeedParser(String feedUrl) {
 		try {
 			this.url = new URL(feedUrl);
