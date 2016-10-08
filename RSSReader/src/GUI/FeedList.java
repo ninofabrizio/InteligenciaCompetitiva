@@ -142,7 +142,10 @@ public class FeedList extends JFrame implements ActionListener, ListSelectionLis
 			// Making sure the index given is valid (user chose a link)
 			if (feedSelected >= 0) {
 
-				String url = list.elementAt(feedSelected).toString();
+				// Had to trim the string to remove line jumping put inside it
+				String url = list.elementAt(feedSelected).toString().trim();
+				System.out.println(list.elementAt(feedSelected).toString());
+				System.out.println(feedList.getSelectedIndex());
 
 				MainReader.removeURL(url);
 				list = MainReader.getList();

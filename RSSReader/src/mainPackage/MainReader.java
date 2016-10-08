@@ -134,14 +134,16 @@ public class MainReader {
 		BufferedWriter writer;
 		
 		try {
+			
 			reader = new BufferedReader(new FileReader(inputFile));
 			writer = new BufferedWriter(new FileWriter(tempFile));
 			
 			// Until the end of the file
 			while((currentLine = reader.readLine()) != null) {
 				
-				// Check and treat if the line has the URL I don't want
-			    if(currentLine.equals(url) || currentLine.equals("")) continue;
+				// Check and treat if the line has the URL I don't want or has empty lines
+			    if(currentLine.equals(url) || currentLine.equals(""))
+			    	continue;
 			    
 			    if(flag) {
 			    	writer.write(currentLine);
