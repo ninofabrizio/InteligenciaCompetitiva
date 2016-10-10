@@ -19,15 +19,14 @@ import webSiteModel.WebSite;
 
 public class WebSiteParser {
 
-	private final URL siteURL;
+	private URL siteURL;
 	
 	public WebSiteParser(String url) {
-		
+
 		try {
 			siteURL = new URL(url);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Malformed URL");
 		}
 	}
 
@@ -47,10 +46,12 @@ public class WebSiteParser {
 			URLConnection conn = siteURL.openConnection();
 		    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		    
+		    // TODO TEST
+		    //System.out.println(in.toString());
 		    while ((str = in.readLine()) != null) {
 		    	
 		    	// Here I get ready to extract links
-		    	if(str.contains("http://")) {
+		    	if(str.contains("http://") || str.contains("https://")) {
 		    		
 					reader = new InputStreamReader((InputStream) siteURL.getContent());
 					
@@ -64,13 +65,20 @@ public class WebSiteParser {
 					            String link = null;
 					            Enumeration<?> attributeNames = a.getAttributeNames();
 					            
-					            if (attributeNames.nextElement().equals(HTML.Attribute.HREF)) {
-					                link = a.getAttribute(HTML.Attribute.HREF).toString();
+					            while(attributeNames.hasMoreElements())
+					            // Checking if is a link and if the class is not of the following
+					            if (attributeNames.nextElement().equals(HTML.Attribute.HREF)
+					            	&& (a.getAttribute(HTML.Attribute.CLASS) == null || (a.getAttribute(HTML.Attribute.CLASS) != null && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("image")
+					            	&& !a.getAttribute(HTML.Attribute.CLASS).toString().equals("googleplus") && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("twitter")
+					            	&& !a.getAttribute(HTML.Attribute.CLASS).toString().equals("facebook") && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("newsletter")))) {
+					            	
+					                link = a.getAttribute(HTML.Attribute.HREF).toString().trim();
 					                
-					                // I decided to only include the ones that end with '.html' to get
-					                // closer to a more precise group of related links to the original
-					                if(link.endsWith(".html"))
+					                // Checking that the links prefix or suffix are valid
+					                if(link.startsWith("http://") || link.startsWith("https://")) {
 					                	site.addReferencedLinks(link);
+					                	//System.out.println(link);
+					                }
 					            }
 					            
 					        }
@@ -103,7 +111,6 @@ public class WebSiteParser {
 		    
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Problem at reading URL");
 		}
 		
 		// Removing the rest of the tags
@@ -114,7 +121,6 @@ public class WebSiteParser {
 		// TODO Tests
 		//for(String link : site.getReferencedLinks())
 		//	System.out.println(link);
-		
 		//System.out.println(content);
 		
 		return site;

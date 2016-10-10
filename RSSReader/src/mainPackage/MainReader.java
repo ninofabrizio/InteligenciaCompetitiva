@@ -112,7 +112,7 @@ public class MainReader {
 			pw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			throw new RuntimeException("File nor found");
+			throw new RuntimeException("File not found");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Couldn't open file");

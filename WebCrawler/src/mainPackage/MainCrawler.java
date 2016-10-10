@@ -1,5 +1,13 @@
 package mainPackage;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import read.WebSiteParser;
@@ -47,7 +55,7 @@ public class MainCrawler {
 			//link = nextSite();
 			WebSite currentSite = getWebSite(link);
 			
-			writeFiles(currentSite);
+			writeFiles(currentSite, i);
 			getReferencedSites(currentSite);
 			
 			i++;
@@ -57,14 +65,73 @@ public class MainCrawler {
 		pw.showMessage(i);
 	}
 	
-	private static void writeFiles(WebSite webSite) {
-		// TODO Auto-generated method stub
+	// Method to write inside both files (the one containing links and the other the contents)
+	private static void writeFiles(WebSite webSite, int siteNumber) {
 		
+		File referencedLinksFile = new File("referencedLinks.txt");
+		File contentsFile = new File("contents.txt");
+		
+		BufferedReader referenceReader;
+		BufferedWriter writer;
+		PrintWriter pw;
+		
+		boolean alreadyReferenced = false;
+		
+		try {
+			
+			// Creating the files, if they don't exist
+			if(!referencedLinksFile.exists())
+				referencedLinksFile.createNewFile();
+			if(!contentsFile.exists())
+				contentsFile.createNewFile();
+			
+			referenceReader = new BufferedReader(new FileReader(referencedLinksFile));
+			writer = new BufferedWriter(new FileWriter(referencedLinksFile, true));
+			
+			pw = new PrintWriter(new FileWriter(contentsFile, true));
+
+			String currentLine;
+			
+			// Dealing with the referenced links file first
+			for(String site : webSite.getReferencedLinks()) {
+				// Checking if the link is already written in the file
+				while((currentLine = referenceReader.readLine()) != null)
+					if(currentLine.equals(site)) {
+						alreadyReferenced = true;
+						break;
+					}
+			    
+				if(alreadyReferenced) {
+					alreadyReferenced = false;
+					continue;
+				}
+				
+				writer.write(site + "\n");
+			}
+
+			referenceReader.close();
+			writer.close();
+			
+			// Now dealing with the contents file
+			pw.print("\nSITE NUMBER " + (siteNumber + 1) + "\nLINK: " + webSite.getLink());
+			pw.print("\n\nLINKS IT REFERENCES:\n");
+			for(String site : webSite.getReferencedLinks())
+				pw.print(site + "\n");
+			pw.print("\nCONTENT:\n" + webSite.getBody() + "\n\n==================== END OF LINK ====================\n\n");
+			
+			pw.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	// Method to get the sites referenced from a current one and to try to add to the 'crawling' line
 	private static void getReferencedSites(WebSite currentSite) {
-		// TODO Auto-generated method stub
 		
+		for(String site : currentSite.getReferencedLinks())
+			addSite(site);
 	}
 
 	// Method to get the web site info from the link
