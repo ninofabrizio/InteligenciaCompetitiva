@@ -1,0 +1,6 @@
+http://g1.globo.com/dynamo/carros/rss2.xml
+http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+http://rss.nytimes.com/services/xml/rss/nyt/World.xml
+http://feeds.ign.com/ign/reviews?format=xml
+http://rss.cnn.com/rss/edition.rss
+http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
