@@ -1,9 +1,5 @@
 package mainPackage;
 
-// TODO Packages for the open URL inside a browser part
-//import java.awt.Desktop;
-//import java.net.URI;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -82,11 +78,11 @@ public class MainReader {
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
-			throw new RuntimeException("File not found");
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Couldn't create new file");
 		}
+		
+		return "";
 	}
 	
 	// Method to write the new feed's URL in the text file
@@ -112,10 +108,8 @@ public class MainReader {
 			pw.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			throw new RuntimeException("File not found");
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Couldn't open file");
 		}
 	}
 
@@ -179,7 +173,6 @@ public class MainReader {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Problem at removing URL");
 		}
 		
 		// Finishing by deleting the temporary file

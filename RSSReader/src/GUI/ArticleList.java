@@ -193,7 +193,6 @@ public class ArticleList extends JFrame implements ActionListener, ListSelection
 				}
 				catch (Exception e) { 
 					e.printStackTrace();
-					throw new RuntimeException("Couldn't open link");
 				}
 			}
 		}

@@ -25,14 +25,13 @@ public class RSSFeedParser {
 	private static final String PUB_DATE = "pubDate";
 	private static final String CATEGORY = "category";
 
-	private final URL url;
+	private URL url;
 
 	public RSSFeedParser(String feedUrl) {
 		try {
 			this.url = new URL(feedUrl);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Malformed URL");
 		}
 	}
 
@@ -142,7 +141,6 @@ public class RSSFeedParser {
 			}
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Problem at reading XML");
 		}
 		return feed;
 	}
@@ -165,7 +163,7 @@ public class RSSFeedParser {
 			return url.openStream();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Problem at opening feed URL");
 		}
+		return null;
 	}
 }
