@@ -1,6 +1,6 @@
 #To Do:
 
-- Timer to avoid visiting sites too fast and getting banned.
+- Make the status bar refresh during execution
 
 - ???
 

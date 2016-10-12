@@ -29,6 +29,12 @@ public class WebSiteParser {
 			e.printStackTrace();
 		}
 	}
+	
+	// Method to check if the URL has been set
+	public boolean urlIsSet() {
+		
+		return (siteURL != null);
+	}
 
 	// Method to read the URL content and separate what I want from the rest
 	public WebSite readWebSite() {
@@ -40,60 +46,56 @@ public class WebSiteParser {
 		String str;
 		
 		site.setLink(siteURL.toString());
+		System.out.println("\n\nCrawling: " + site.getLink());
 		
 		try {
 			
 			URLConnection conn = siteURL.openConnection();
 		    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		    
-		    // TODO TEST
-		    //System.out.println(in.toString());
+			reader = new InputStreamReader((InputStream) siteURL.getContent());
+			
+			// Here I get ready to extract the links
+			new ParserDelegator().parse(reader, new HTMLEditorKit.ParserCallback() {
+				
+				// Doing an override of a class method to be able to extract info from HTML tag
+			    public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+			    	
+			        if (t == HTML.Tag.A) {
+			        	
+			            String link = null;
+			            Enumeration<?> attributeNames = a.getAttributeNames();
+			            
+			            while(attributeNames.hasMoreElements()) {
+			            	// Checking if is a link and if the class is not of the following (note that there's no pattern in the names, so depending of the HTML some may still pass)
+			            	if (attributeNames.nextElement().equals(HTML.Attribute.HREF)
+			            			&& (a.getAttribute(HTML.Attribute.CLASS) == null || (a.getAttribute(HTML.Attribute.CLASS) != null && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("image")))) {
+			            	
+			            		link = a.getAttribute(HTML.Attribute.HREF).toString().trim();
+			                
+			            		// Checking that the links prefix or suffix are valid
+			            		if(link.startsWith("http://") || link.startsWith("https://"))
+			            			site.addReferencedLinks(link);
+			            	}
+			            }
+			        }
+			    }
+			}, true);
+    		
+			reader.close();
+
+			// Now I extract the content
 		    while ((str = in.readLine()) != null) {
 		    	
-		    	// Here I get ready to extract links
-		    	if(str.contains("http://") || str.contains("https://")) {
-		    		
-					reader = new InputStreamReader((InputStream) siteURL.getContent());
-					
-					new ParserDelegator().parse(reader, new HTMLEditorKit.ParserCallback() {
-						
-						// Doing an override of a class method to be able to extract info from HTML tag
-					    public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
-					    	
-					        if (t == HTML.Tag.A) {
-					        	
-					            String link = null;
-					            Enumeration<?> attributeNames = a.getAttributeNames();
-					            
-					            while(attributeNames.hasMoreElements())
-					            // Checking if is a link and if the class is not of the following
-					            if (attributeNames.nextElement().equals(HTML.Attribute.HREF)
-					            	&& (a.getAttribute(HTML.Attribute.CLASS) == null || (a.getAttribute(HTML.Attribute.CLASS) != null && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("image")
-					            	&& !a.getAttribute(HTML.Attribute.CLASS).toString().equals("googleplus") && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("twitter")
-					            	&& !a.getAttribute(HTML.Attribute.CLASS).toString().equals("facebook") && !a.getAttribute(HTML.Attribute.CLASS).toString().equals("newsletter")))) {
-					            	
-					                link = a.getAttribute(HTML.Attribute.HREF).toString().trim();
-					                
-					                // Checking that the links prefix or suffix are valid
-					                if(link.startsWith("http://") || link.startsWith("https://")) {
-					                	site.addReferencedLinks(link);
-					                	//System.out.println(link);
-					                }
-					            }
-					            
-					        }
-					    }
-					}, true);
-		    		
-					reader.close();
+		    	// Here I ignore lines that contains (usually) javascript tags or style format
+		    	if(str.contains("<script") && str.contains("</script>")
+		    		|| str.contains("<style") && str.contains("</style>")) {
+		    		str = str.replaceAll("<script.*</script>", "");
+		    		str = str.replaceAll("<style.*</style>", "");
 		    	}
 		    	
-		    	// Here I ignore lines that contains (usually) javascript tags
-		    	if(str.contains("<script") && str.contains("</script>"))
-		    		str = str.replaceAll("<script.*</script>", "");
-		    	
 		    	// In case the tags listed don't end in the same line
-		    	else if((str.contains("<script") && str.contains("</script>") == false)
+		    	if((str.contains("<script") && str.contains("</script>") == false)
 		    			|| (str.contains("<style") && str.contains("</style>") == false))
 		    		isTag = true;
 		    	
@@ -117,11 +119,6 @@ public class WebSiteParser {
 		String content = contentBuilder.toString().replaceAll("\\<[^>]*>", "");
 		
 		site.setBody(content);
-		
-		// TODO Tests
-		//for(String link : site.getReferencedLinks())
-		//	System.out.println(link);
-		//System.out.println(content);
 		
 		return site;
 	}

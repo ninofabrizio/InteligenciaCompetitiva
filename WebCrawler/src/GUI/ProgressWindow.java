@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+@SuppressWarnings("serial")
 public class ProgressWindow extends JFrame {
 
 	private JPanel progressPanel;
@@ -85,6 +86,6 @@ public class ProgressWindow extends JFrame {
 		}
 		
 		JOptionPane.showMessageDialog(message, msg, title, JOptionPane.PLAIN_MESSAGE);
-		System.exit(0);
+		setVisible(false);
 	}
 }

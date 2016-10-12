@@ -15,8 +15,10 @@ public class WebSite {
 	
 	public void addReferencedLinks(String referencedLink) {
 		
-		if(!ReferencedLinks.contains(referencedLink) && !link.equals(referencedLink))
+		if(!ReferencedLinks.contains(referencedLink) && !link.equals(referencedLink)) {
 			ReferencedLinks.add(referencedLink);
+			System.out.println("Reference: " + referencedLink);
+		}
 	}
 	
 	public String getLink() {

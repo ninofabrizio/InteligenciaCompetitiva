@@ -9,35 +9,42 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import read.WebSiteParser;
 import webSiteModel.WebSite;
 import GUI.InputWindow;
 import GUI.ProgressWindow;
 
-public class MainCrawler {
+public class MainCrawler extends Thread {
 
 	private static int maxLinksNum;
+	private static InputWindow iw;
 	
 	// My lists for visited sites and for sites to visit, respectively
-	private static ArrayList<String> crawledSites = new ArrayList<String>();
-    private static ArrayList<String> linkedSites = new ArrayList<String>();
+	private static ArrayList<String> crawledSites;
+    private static ArrayList<String> linkedSites;
 	
+    // A fake user agent I use to tell the servers this is a normal browser
+ 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
+    
 	public static void main(String[] args) {
 		
-		InputWindow iw = new InputWindow();
+		iw = new InputWindow();
 		iw.setVisible(true);
 	}
 
 	// Method to get initial info from the frame
 	public static void setInfo(int num, String link) {
 
+		crawledSites = new ArrayList<String>();
+	    linkedSites = new ArrayList<String>();
+		
 		maxLinksNum = num;
 		addSite(link);
-
-		// TODO Test
-		//System.out.println("Number " + maxLinksNum + "\nLink " + originalLink);
 		
+		iw.setTextEmpty();
+		iw.setVisible(false);
 		startCrawling();
 	}
 
@@ -49,20 +56,35 @@ public class MainCrawler {
 		ProgressWindow pw = new ProgressWindow(maxLinksNum);
 		pw.setVisible(true);
 		
+		// Setting my user_agent for the site to know me, in this case I'm a (fake) browser
+		System.setProperty("http.agent", USER_AGENT);
+		
 		// I also check if there are no more sites referenced
 		while(i < maxLinksNum && (link = nextSite()) != null) {
 			
-			//link = nextSite();
-			WebSite currentSite = getWebSite(link);
-			
-			writeFiles(currentSite, i);
-			getReferencedSites(currentSite);
-			
 			i++;
 		    pw.updateBar(i);
+			
+			WebSite currentSite = getWebSite(link);
+			
+			if(currentSite == null)
+			    continue;
+			
+			writeFiles(currentSite, i - 1);
+			getReferencedSites(currentSite);
+		    
+		    // Waiting 10 seconds before the next 'crawl' to avoid getting 'hammered' by the sites
+		    if(i < maxLinksNum && linkedSites.size() > 0) {
+		    	try {
+		    		sleep(10000);
+		    	} catch (InterruptedException e) {
+		    		e.printStackTrace();
+		    	}
+		    }
 		}
 		
 		pw.showMessage(i);
+		iw.setVisible(true);
 	}
 	
 	// Method to write inside both files (the one containing links and the other the contents)
@@ -85,7 +107,6 @@ public class MainCrawler {
 			if(!contentsFile.exists())
 				contentsFile.createNewFile();
 			
-			referenceReader = new BufferedReader(new FileReader(referencedLinksFile));
 			writer = new BufferedWriter(new FileWriter(referencedLinksFile, true));
 			
 			pw = new PrintWriter(new FileWriter(contentsFile, true));
@@ -94,6 +115,9 @@ public class MainCrawler {
 			
 			// Dealing with the referenced links file first
 			for(String site : webSite.getReferencedLinks()) {
+				
+				referenceReader = new BufferedReader(new FileReader(referencedLinksFile));
+				
 				// Checking if the link is already written in the file
 				while((currentLine = referenceReader.readLine()) != null)
 					if(currentLine.equals(site)) {
@@ -101,6 +125,8 @@ public class MainCrawler {
 						break;
 					}
 			    
+				referenceReader.close();
+				
 				if(alreadyReferenced) {
 					alreadyReferenced = false;
 					continue;
@@ -108,8 +134,7 @@ public class MainCrawler {
 				
 				writer.write(site + "\n");
 			}
-
-			referenceReader.close();
+			
 			writer.close();
 			
 			// Now dealing with the contents file
@@ -117,7 +142,7 @@ public class MainCrawler {
 			pw.print("\n\nLINKS IT REFERENCES:\n");
 			for(String site : webSite.getReferencedLinks())
 				pw.print(site + "\n");
-			pw.print("\nCONTENT:\n" + webSite.getBody() + "\n\n==================== END OF LINK ====================\n\n");
+			pw.print("\nCONTENT:\n" + webSite.getBody() + "\n\n\n\n\n\n==================== END OF LINK ====================\n\n\n\n\n\n");
 			
 			pw.close();
 		} catch (FileNotFoundException e) {
@@ -130,6 +155,9 @@ public class MainCrawler {
 	// Method to get the sites referenced from a current one and to try to add to the 'crawling' line
 	private static void getReferencedSites(WebSite currentSite) {
 		
+		// Sorting the order of the links before adding them, just to make things more interesting...
+		Collections.shuffle(currentSite.getReferencedLinks());
+		
 		for(String site : currentSite.getReferencedLinks())
 			addSite(site);
 	}
@@ -138,7 +166,12 @@ public class MainCrawler {
 	public static WebSite getWebSite(String url) {
 
 		WebSiteParser parser = new WebSiteParser(url);
-		return parser.readWebSite();
+		
+		if(parser.urlIsSet())
+			return parser.readWebSite();
+		
+		// In case the url is not set
+		return null;
 	}
 
 	// Method to add a link that hasn't been crawled yet

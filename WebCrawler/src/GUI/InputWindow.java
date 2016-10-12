@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import mainPackage.MainCrawler;
 
+@SuppressWarnings("serial")
 public class InputWindow extends JFrame implements ActionListener {
 
 	private JPanel inputPanel;
@@ -88,14 +89,14 @@ public class InputWindow extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		
 		if(event.getSource() == getInfo && checkNumberField(numberInput.getText()) 
-										&& checkLinkField(linkInput.getText())) {
-
-				MainCrawler.setInfo(maxLinksNum, linkInput.getText());
-				//numberInput.setText("");
-				//linkInput.setText("");
-				
-				setVisible(false);
-			}
+										&& checkLinkField(linkInput.getText()))
+			MainCrawler.setInfo(maxLinksNum, linkInput.getText());
+	}
+	
+	public void setTextEmpty() {
+		
+		numberInput.setText("");
+		linkInput.setText("");
 	}
 	
 	// Method to see if the text inside the link field fits
