@@ -100,7 +100,7 @@ public class MainReader {
 				pw = new PrintWriter(file);
 			else {
 				pw = new PrintWriter(new FileWriter(file, true));
-				pw.print("\n");
+				pw.print("\r\n");
 			}
 			
 			pw.print(url);

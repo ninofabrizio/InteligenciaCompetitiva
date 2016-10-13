@@ -132,17 +132,17 @@ public class MainCrawler extends Thread {
 					continue;
 				}
 				
-				writer.write(site + "\n");
+				writer.write(site + "\r\n");
 			}
 			
 			writer.close();
 			
 			// Now dealing with the contents file
-			pw.print("\nSITE NUMBER " + (siteNumber + 1) + "\nLINK: " + webSite.getLink());
-			pw.print("\n\nLINKS IT REFERENCES:\n");
+			pw.print("\r\nSITE NUMBER " + (siteNumber + 1) + "\r\nLINK: " + webSite.getLink());
+			pw.print("\r\n\r\nLINKS IT REFERENCES:\r\n");
 			for(String site : webSite.getReferencedLinks())
-				pw.print(site + "\n");
-			pw.print("\nCONTENT:\n" + webSite.getBody() + "\n\n\n\n\n\n==================== END OF LINK ====================\n\n\n\n\n\n");
+				pw.print(site + "\r\n");
+			pw.print("\r\nCONTENT:\r\n" + webSite.getBody() + "\r\n\r\n\r\n\r\n\r\n\r\n==================== END OF LINK ====================\r\n\r\n\r\n\r\n\r\n\r\n");
 			
 			pw.close();
 		} catch (FileNotFoundException e) {
